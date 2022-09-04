@@ -16,4 +16,6 @@ Upon triggering, the sample would become failed with corresponding assertion sub
 
 That's it!
 
+Install it via Plugins Manager or [Download Plugin](https://jmeter-plugins.org/?search=jpgc-esa)
+
 [Support Forum](https://jmeter-plugins.org/support/)

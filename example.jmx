@@ -166,6 +166,7 @@ without actual network activity. This helps debugging tests.</stringProp>
       </hashTree>
       <org.jmeterplugins.assertions.ExtractorSuccessAssertion guiclass="org.jmeterplugins.assertions.ExtractorSuccessAssertionGui" testclass="org.jmeterplugins.assertions.ExtractorSuccessAssertion" testname="jp@gc - Extractor Success Assertion" enabled="true">
         <stringProp name="DefaultVals">DEFAULT</stringProp>
+        <boolProp name="UseStandard">true</boolProp>
       </org.jmeterplugins.assertions.ExtractorSuccessAssertion>
       <hashTree/>
       <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">

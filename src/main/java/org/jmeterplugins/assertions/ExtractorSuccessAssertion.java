@@ -15,17 +15,15 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterThread;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.threads.SamplePackage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
 
 
 public class ExtractorSuccessAssertion extends AbstractTestElement implements Serializable, Assertion, LoopIterationListener {
-    private static final Logger log = LoggerFactory.getLogger(ExtractorSuccessAssertion.class);
     private static final long serialVersionUID = 1L;
     private static final String DEFAULT_VALS = "DefaultVals";
+    private static final String USE_STANDARD = "UseStandard";
     private final Map<String, String> varCache;
 
     public ExtractorSuccessAssertion() {
@@ -38,7 +36,7 @@ public class ExtractorSuccessAssertion extends AbstractTestElement implements Se
         JMeterVariables threadVars = threadContext.getVariables();
         Set<String> defaultValuesToCheck = this.getDefaultValuesSet();
 
-        if (true) { // TODO
+        if (isHandleStandardExtractors()) {
             SamplePackage pack = (SamplePackage) threadVars.getObject(JMeterThread.PACKAGE_OBJECT);
             List<PostProcessor> postProcessors = pack.getPostProcessors();
             // handle known extractor types (guessing by *Extractor suffix is not viable)
@@ -80,9 +78,8 @@ public class ExtractorSuccessAssertion extends AbstractTestElement implements Se
             }
         }
 
-        if (true) {
+        if (defaultValuesToCheck.size() > 0) {
             for (Map.Entry<String, Object> var : threadVars.entrySet()) {
-                log.info("var " + var.toString());
                 // check all variables as the laziest option
                 String val = var.getValue().toString();
                 String cached = varCache.getOrDefault(var.getKey(), "basically, a long string that should not match");
@@ -93,20 +90,23 @@ public class ExtractorSuccessAssertion extends AbstractTestElement implements Se
                 varCache.put(var.getKey(), val);
 
                 if (defaultValuesToCheck.contains(val)) {
-                    log.warn("Triggered on " + var);
                     return getResult("Variable " + var.getKey() + " has default value: " + val);
-                } else {
-                    log.info("Var is fine: " + var.getKey() + "=" + val);
                 }
             }
         }
 
-        // guess by "extractor" suffix
-        // cache already checked
-        // check variable is defined
-        // check variable is empty
+        // TODO: check variable is defined
+        // TODO: check variable is empty
 
         return getResult(""); // TODO: accumulate messages and report all at once?
+    }
+
+    public boolean isHandleStandardExtractors() {
+        return getPropertyAsBoolean(USE_STANDARD);
+    }
+
+    public void setHandleStandardExtractors(boolean flag) {
+        setProperty(USE_STANDARD, flag);
     }
 
     private AssertionResult varsContain(JMeterVariables threadVars, String refName, String val) {
@@ -126,8 +126,11 @@ public class ExtractorSuccessAssertion extends AbstractTestElement implements Se
     }
 
     public Set<String> getDefaultValuesSet() {
-        log.info("Default vals: " + getDefaultValues());
-        String[] split = getDefaultValues().split(",");
+        String defaultValues = getDefaultValues();
+        if (defaultValues.equals("")) {
+            return new HashSet<>();
+        }
+        String[] split = defaultValues.split(",");
         return new HashSet<>(Arrays.asList(split));
     }
 
